@@ -1,5 +1,6 @@
 #include <QString>
 #include <QtTest>
+#include <QCoreApplication>
 #include "../application/cppfromqmlgenerator.h"
 
 class EmptyObjectTest : public QObject
@@ -11,6 +12,7 @@ public:
 
 private Q_SLOTS:
     void convertEmptyQMLObject();
+    void convertQMLObjectWithOneStringProperty();
 };
 
 EmptyObjectTest::EmptyObjectTest()
@@ -19,23 +21,42 @@ EmptyObjectTest::EmptyObjectTest()
 
 void EmptyObjectTest::convertEmptyQMLObject()
 {
-    // Open file with empty QML Object
-    const QString emptyQMLObjectFilePath = QString(SRCDIR)+"/qml/EmptyObject.qml";
-    QFile qmlSource(emptyQMLObjectFilePath);
-    const bool qmlFileOpenSuccesful = qmlSource.open(QIODevice::ReadOnly|QIODevice::Text);
-    QVERIFY2(qmlFileOpenSuccesful, "Failed to open QML file");
     // Open file with expected output.
     const QString emptyCppObjectHeaderFilePath = QString(SRCDIR)+"/cpp/emptyobject.h";
     QFile cppHeader(emptyCppObjectHeaderFilePath);
     const bool headerFileOpenSuccesful = cppHeader.open(QIODevice::ReadOnly|QIODevice::Text);
     QVERIFY2(headerFileOpenSuccesful, "Failed to open .h file");
     // Generate
-    QTextStream readStream(&qmlSource);
-    CppFromQMLGenerator generator;
-    QString generatedHeader = generator.generateHeader(readStream);
+    const QString emptyQMLObjectFilePath = QString(SRCDIR)+"/qml/EmptyObject.qml";
+    CppFromQMLGenerator generator(emptyQMLObjectFilePath);
+    QString generatedHeader = generator.generateHeader();
     // Compare results
+    QTextStream compareStream(&cppHeader);
+    QCOMPARE(generatedHeader, compareStream.readAll());
 }
 
-QTEST_APPLESS_MAIN(EmptyObjectTest)
+void EmptyObjectTest::convertQMLObjectWithOneStringProperty()
+{
+    // Open file with expected output.
+    const QString oneStringCppObjectHeaderFilePath = QString(SRCDIR)+"/cpp/onestringobject.h";
+    QFile cppHeader(oneStringCppObjectHeaderFilePath);
+    const bool headerFileOpenSuccesful = cppHeader.open(QIODevice::ReadOnly|QIODevice::Text);
+    QVERIFY2(headerFileOpenSuccesful, "Failed to open .h file");
+    // Generate
+    const QString oneStringQMLObjectFilePath = QString(SRCDIR)+"/qml/OneStringObject.qml";
+    CppFromQMLGenerator generator(oneStringQMLObjectFilePath);
+    QString generatedHeader = generator.generateHeader();
+    // Compare results
+    QTextStream compareStream(&cppHeader);
+    QCOMPARE(generatedHeader, compareStream.readAll());
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+    EmptyObjectTest tc;
+    QTEST_SET_MAIN_SOURCE_PATH
+    return QTest::qExec(&tc, argc, argv);
+}
 
 #include "tst_emptyobjecttest.moc"

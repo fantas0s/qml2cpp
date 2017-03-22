@@ -1,10 +1,36 @@
 #ifndef CPPFROMQMLGENERATOR_H
 #define CPPFROMQMLGENERATOR_H
-#include <QTextStream>
+#include <QString>
+#include <QFile>
+#include <QUrl>
+#include <QQmlApplicationEngine>
+
 class CppFromQMLGenerator
 {
 public:
-    QString generateHeader(QTextStream& qmlStream);
+    CppFromQMLGenerator(QString qmlFileName);
+    ~CppFromQMLGenerator();
+    QString generateHeader();
+private:
+    CppFromQMLGenerator();
+    void parseClassName();
+    void generateMultipleInclusionProtectionBegin();
+    void generateMultipleInclusionProtectionEnd();
+    void generateHeaderIncludes();
+    void generateClassDeclaration();
+    void generateHeaderPublic();
+    void generateHeaderGetMethods();
+    void generateHeaderSetMethods();
+    void generateHeaderSignals();
+    void generateHeaderPrivateProperties();
+    bool m_conversionSuccessful;
+    QUrl m_qmlFileName;
+    QString m_className;
+    QString m_headerFileContents;
+    QQmlApplicationEngine m_appEngine;
+    const QMetaObject* m_rootObject;
+
+    void generateClassClosing();
 };
 
 #endif // CPPFROMQMLGENERATOR_H

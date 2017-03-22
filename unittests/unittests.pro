@@ -4,13 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += testlib
-
-QT       -= gui
+QT       += testlib qml gui
 
 TARGET = tst_emptyobjecttest
 CONFIG   += console
-CONFIG   -= app_bundle
 
 TEMPLATE = app
 
