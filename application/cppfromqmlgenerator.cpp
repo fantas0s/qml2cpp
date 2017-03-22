@@ -24,6 +24,16 @@ CppFromQMLGenerator::CppFromQMLGenerator(QString qmlFileName) :
     } else {
         m_rootObject = Q_NULLPTR;
     }
+    QString className = m_qmlFileName.fileName();
+    if (!className.endsWith(".qml")) {
+        qWarning() << "Filename is invalid:" << className;
+        m_className = "";
+    }
+    else
+    {
+        className.chop(4);
+        m_className = className;
+    }
 }
 
 CppFromQMLGenerator::~CppFromQMLGenerator()
@@ -32,8 +42,8 @@ CppFromQMLGenerator::~CppFromQMLGenerator()
 
 QString CppFromQMLGenerator::generateHeader()
 {
+    m_headerFileContents = "";
     m_conversionSuccessful = true;
-    parseClassName();
     generateMultipleInclusionProtectionBegin();
     generateHeaderIncludes();
     generateClassDeclaration();
@@ -48,20 +58,6 @@ QString CppFromQMLGenerator::generateHeader()
         return m_headerFileContents;
     else
         return QString();
-}
-
-void CppFromQMLGenerator::parseClassName()
-{
-    QString className = m_qmlFileName.fileName();
-    if (!className.endsWith(".qml")) {
-        qWarning() << "Filename is invalid:" << className;
-        m_conversionSuccessful = false;
-    }
-    else
-    {
-        className.chop(4);
-        m_className = className;
-    }
 }
 
 void CppFromQMLGenerator::generateMultipleInclusionProtectionBegin()
@@ -174,4 +170,27 @@ void CppFromQMLGenerator::generateHeaderPrivateProperties()
 void CppFromQMLGenerator::generateClassClosing()
 {
     m_headerFileContents += "};\n";
+}
+
+QString CppFromQMLGenerator::generateSource()
+{
+    m_sourceFileContents = "";
+    m_conversionSuccessful = true;
+    generateSourceInclude();
+    generateSourceConstructor();
+    if (m_conversionSuccessful)
+        return m_sourceFileContents;
+    else
+        return QString();
+}
+
+void CppFromQMLGenerator::generateSourceInclude()
+{
+    m_sourceFileContents += "#include \"" + m_className.toLower() + ".h\"\n";
+}
+
+void CppFromQMLGenerator::generateSourceConstructor()
+{
+    m_sourceFileContents += m_className + "::" + m_className + "()\n";
+    m_sourceFileContents += "{\n}\n";
 }

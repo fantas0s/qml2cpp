@@ -11,9 +11,9 @@ public:
     CppFromQMLGenerator(QString qmlFileName);
     ~CppFromQMLGenerator();
     QString generateHeader();
+    QString generateSource();
 private:
     CppFromQMLGenerator();
-    void parseClassName();
     void generateMultipleInclusionProtectionBegin();
     void generateMultipleInclusionProtectionEnd();
     void generateHeaderIncludes();
@@ -23,10 +23,13 @@ private:
     void generateHeaderSetMethods();
     void generateHeaderSignals();
     void generateHeaderPrivateProperties();
+    void generateSourceInclude();
+    void generateSourceConstructor();
     bool m_conversionSuccessful;
     QUrl m_qmlFileName;
     QString m_className;
     QString m_headerFileContents;
+    QString m_sourceFileContents;
     QQmlApplicationEngine m_appEngine;
     const QMetaObject* m_rootObject;
 

@@ -9,6 +9,7 @@ class EmptyObjectTest : public QObject
 
 public:
     EmptyObjectTest();
+    QFile* sourceFileOpen(const QString fileName);
 
 private Q_SLOTS:
     void convertEmptyQMLObject();
@@ -20,52 +21,56 @@ EmptyObjectTest::EmptyObjectTest()
 {
 }
 
+QFile* EmptyObjectTest::sourceFileOpen(const QString fileName)
+{
+    const QString fullFilePath = QString(SRCDIR)+fileName;
+    QFile* fileToOpen = new QFile(fullFilePath);
+    fileToOpen->open(QIODevice::ReadOnly|QIODevice::Text);
+    return fileToOpen;
+}
+
 void EmptyObjectTest::convertEmptyQMLObject()
 {
-    // Open file with expected output.
-    const QString emptyCppObjectHeaderFilePath = QString(SRCDIR)+"/cpp/emptyobject.h";
-    QFile cppHeader(emptyCppObjectHeaderFilePath);
-    const bool headerFileOpenSuccesful = cppHeader.open(QIODevice::ReadOnly|QIODevice::Text);
-    QVERIFY2(headerFileOpenSuccesful, "Failed to open .h file");
-    // Generate
     const QString emptyQMLObjectFilePath = QString(SRCDIR)+"/qml/EmptyObject.qml";
     CppFromQMLGenerator generator(emptyQMLObjectFilePath);
+    // Generate header
     QString generatedHeader = generator.generateHeader();
-    // Compare results
-    QTextStream compareStream(&cppHeader);
-    QCOMPARE(generatedHeader, compareStream.readAll());
+    QFile* cppHeader = sourceFileOpen("/cpp/emptyobject.h");
+    QTextStream headerCompareStream(cppHeader);
+    QCOMPARE(generatedHeader, headerCompareStream.readAll());
+    delete cppHeader;
+    // Generate source
+    QString generatedSource = generator.generateSource();
+    QFile* cppSource = sourceFileOpen("/cpp/emptyobject.cpp");
+    QTextStream sourceCompareStream(cppSource);
+    QCOMPARE(generatedSource, sourceCompareStream.readAll());
+    delete cppSource;
 }
 
 void EmptyObjectTest::convertQMLObjectWithOneStringProperty()
 {
-    // Open file with expected output.
-    const QString oneStringCppObjectHeaderFilePath = QString(SRCDIR)+"/cpp/onestringobject.h";
-    QFile cppHeader(oneStringCppObjectHeaderFilePath);
-    const bool headerFileOpenSuccesful = cppHeader.open(QIODevice::ReadOnly|QIODevice::Text);
-    QVERIFY2(headerFileOpenSuccesful, "Failed to open .h file");
+    QFile* cppHeader = sourceFileOpen("/cpp/onestringobject.h");
     // Generate
     const QString oneStringQMLObjectFilePath = QString(SRCDIR)+"/qml/OneStringObject.qml";
     CppFromQMLGenerator generator(oneStringQMLObjectFilePath);
     QString generatedHeader = generator.generateHeader();
     // Compare results
-    QTextStream compareStream(&cppHeader);
+    QTextStream compareStream(cppHeader);
     QCOMPARE(generatedHeader, compareStream.readAll());
+    delete cppHeader;
 }
 
 void EmptyObjectTest::convertQMLObjectWithMultipleProperties()
 {
-    // Open file with expected output.
-    const QString multiplePropertiesCppObjectHeaderFilePath = QString(SRCDIR)+"/cpp/multiplepropertiesobject.h";
-    QFile cppHeader(multiplePropertiesCppObjectHeaderFilePath);
-    const bool headerFileOpenSuccesful = cppHeader.open(QIODevice::ReadOnly|QIODevice::Text);
-    QVERIFY2(headerFileOpenSuccesful, "Failed to open .h file");
+    QFile* cppHeader = sourceFileOpen("/cpp/multiplepropertiesobject.h");
     // Generate
     const QString multiplePropertiesQMLObjectFilePath = QString(SRCDIR)+"/qml/MultiplePropertiesObject.qml";
     CppFromQMLGenerator generator(multiplePropertiesQMLObjectFilePath);
     QString generatedHeader = generator.generateHeader();
     // Compare results
-    QTextStream compareStream(&cppHeader);
+    QTextStream compareStream(cppHeader);
     QCOMPARE(generatedHeader, compareStream.readAll());
+    delete cppHeader;
 }
 
 int main(int argc, char *argv[])
