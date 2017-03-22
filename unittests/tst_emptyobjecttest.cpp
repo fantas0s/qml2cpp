@@ -1,21 +1,6 @@
-#include <QString>
-#include <QtTest>
-#include <QCoreApplication>
+#include "tst_emptyobjecttest.h"
 #include "../application/cppfromqmlgenerator.h"
-
-class EmptyObjectTest : public QObject
-{
-    Q_OBJECT
-
-public:
-    EmptyObjectTest();
-    QFile* sourceFileOpen(const QString fileName);
-
-private Q_SLOTS:
-    void convertEmptyQMLObject();
-    void convertQMLObjectWithOneStringProperty();
-    void convertQMLObjectWithMultipleProperties();
-};
+#include <QtTest>
 
 EmptyObjectTest::EmptyObjectTest()
 {
@@ -46,39 +31,3 @@ void EmptyObjectTest::convertEmptyQMLObject()
     QCOMPARE(generatedSource, sourceCompareStream.readAll());
     delete cppSource;
 }
-
-void EmptyObjectTest::convertQMLObjectWithOneStringProperty()
-{
-    QFile* cppHeader = sourceFileOpen("/cpp/onestringobject.h");
-    // Generate
-    const QString oneStringQMLObjectFilePath = QString(SRCDIR)+"/qml/OneStringObject.qml";
-    CppFromQMLGenerator generator(oneStringQMLObjectFilePath);
-    QString generatedHeader = generator.generateHeader();
-    // Compare results
-    QTextStream compareStream(cppHeader);
-    QCOMPARE(generatedHeader, compareStream.readAll());
-    delete cppHeader;
-}
-
-void EmptyObjectTest::convertQMLObjectWithMultipleProperties()
-{
-    QFile* cppHeader = sourceFileOpen("/cpp/multiplepropertiesobject.h");
-    // Generate
-    const QString multiplePropertiesQMLObjectFilePath = QString(SRCDIR)+"/qml/MultiplePropertiesObject.qml";
-    CppFromQMLGenerator generator(multiplePropertiesQMLObjectFilePath);
-    QString generatedHeader = generator.generateHeader();
-    // Compare results
-    QTextStream compareStream(cppHeader);
-    QCOMPARE(generatedHeader, compareStream.readAll());
-    delete cppHeader;
-}
-
-int main(int argc, char *argv[])
-{
-    QCoreApplication app(argc, argv);
-    EmptyObjectTest tc;
-    QTEST_SET_MAIN_SOURCE_PATH
-    return QTest::qExec(&tc, argc, argv);
-}
-
-#include "tst_emptyobjecttest.moc"
