@@ -3,8 +3,9 @@
 #include <QObject>
 class EmptyObject : public QObject
 {
+public:
+    EmptyObject();
 private:
     Q_OBJECT
-    EmptyObject();
 };
 #endif /* _EMPTYOBJECT_H */

@@ -13,6 +13,7 @@ public:
 private Q_SLOTS:
     void convertEmptyQMLObject();
     void convertQMLObjectWithOneStringProperty();
+    void convertQMLObjectWithMultipleProperties();
 };
 
 EmptyObjectTest::EmptyObjectTest()
@@ -45,6 +46,22 @@ void EmptyObjectTest::convertQMLObjectWithOneStringProperty()
     // Generate
     const QString oneStringQMLObjectFilePath = QString(SRCDIR)+"/qml/OneStringObject.qml";
     CppFromQMLGenerator generator(oneStringQMLObjectFilePath);
+    QString generatedHeader = generator.generateHeader();
+    // Compare results
+    QTextStream compareStream(&cppHeader);
+    QCOMPARE(generatedHeader, compareStream.readAll());
+}
+
+void EmptyObjectTest::convertQMLObjectWithMultipleProperties()
+{
+    // Open file with expected output.
+    const QString multiplePropertiesCppObjectHeaderFilePath = QString(SRCDIR)+"/cpp/multiplepropertiesobject.h";
+    QFile cppHeader(multiplePropertiesCppObjectHeaderFilePath);
+    const bool headerFileOpenSuccesful = cppHeader.open(QIODevice::ReadOnly|QIODevice::Text);
+    QVERIFY2(headerFileOpenSuccesful, "Failed to open .h file");
+    // Generate
+    const QString multiplePropertiesQMLObjectFilePath = QString(SRCDIR)+"/qml/MultiplePropertiesObject.qml";
+    CppFromQMLGenerator generator(multiplePropertiesQMLObjectFilePath);
     QString generatedHeader = generator.generateHeader();
     // Compare results
     QTextStream compareStream(&cppHeader);

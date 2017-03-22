@@ -2,8 +2,17 @@
 #include <QDebug>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QVector>
 
 #define QML_INHERITED_ITEM_COUNT 41
+
+static QVector<QString> alreadySupportedTypes({"int",
+                                             "bool",
+                                             "double",
+                                             "float",
+                                             "char",
+                                             "short",
+                                             "long"});
 
 CppFromQMLGenerator::CppFromQMLGenerator(QString qmlFileName) :
     m_conversionSuccessful(false),
@@ -69,8 +78,18 @@ void CppFromQMLGenerator::generateMultipleInclusionProtectionEnd()
 void CppFromQMLGenerator::generateHeaderIncludes()
 {
     m_headerFileContents += "#include <QObject>\n";
+    QVector<QString> listOfIncludes;
     for (int i = QML_INHERITED_ITEM_COUNT ; i < m_rootObject->propertyCount() ; ++i) {
-        m_headerFileContents += "#include <" + QString(m_rootObject->property(i).typeName()) + ">\n";
+        const QString typeName(m_rootObject->property(i).typeName());
+        if (!alreadySupportedTypes.contains(typeName)) {
+            if (!listOfIncludes.contains(typeName)) {
+                listOfIncludes.append(typeName);
+            }
+        }
+    }
+    QString appendString;
+    foreach (appendString, listOfIncludes) {
+        m_headerFileContents += "#include <" + appendString + ">\n";
     }
 }
 
@@ -82,8 +101,8 @@ void CppFromQMLGenerator::generateClassDeclaration()
 
 void CppFromQMLGenerator::generateHeaderPublic()
 {
-    if (m_rootObject->propertyCount() > QML_INHERITED_ITEM_COUNT)
-        m_headerFileContents += "public:\n";
+    m_headerFileContents += "public:\n";
+    m_headerFileContents += "    " + m_className + "();\n";
 }
 
 void CppFromQMLGenerator::generateHeaderGetMethods()
@@ -143,7 +162,6 @@ void CppFromQMLGenerator::generateHeaderPrivateProperties()
                              + QString(m_rootObject->property(i).name())
                              + "Changed)\n";
     }
-    m_headerFileContents += "    " + m_className + "();\n";
     for (int i = QML_INHERITED_ITEM_COUNT ; i < m_rootObject->propertyCount() ; ++i) {
         m_headerFileContents += "    "
                           + QString(m_rootObject->property(i).typeName())
