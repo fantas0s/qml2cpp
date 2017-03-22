@@ -25,6 +25,12 @@ void ObjectsWithPropertiesTest::convertQMLObjectWithOneStringProperty()
     QTextStream compareStream(cppHeader);
     QCOMPARE(generatedHeader, compareStream.readAll());
     delete cppHeader;
+    // Generate source
+    QString generatedSource = generator.generateSource();
+    QFile* cppSource = sourceFileOpen("/cpp/onestringobject.cpp");
+    QTextStream sourceCompareStream(cppSource);
+    QCOMPARE(generatedSource, sourceCompareStream.readAll());
+    delete cppSource;
 }
 
 void ObjectsWithPropertiesTest::convertQMLObjectWithMultipleProperties()
@@ -38,4 +44,10 @@ void ObjectsWithPropertiesTest::convertQMLObjectWithMultipleProperties()
     QTextStream compareStream(cppHeader);
     QCOMPARE(generatedHeader, compareStream.readAll());
     delete cppHeader;
+    // Generate source
+    QString generatedSource = generator.generateSource();
+    QFile* cppSource = sourceFileOpen("/cpp/multiplepropertiesobject.cpp");
+    QTextStream sourceCompareStream(cppSource);
+    QCOMPARE(generatedSource, sourceCompareStream.readAll());
+    delete cppSource;
 }

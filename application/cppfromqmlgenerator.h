@@ -25,7 +25,8 @@ private:
     void generateHeaderPrivateProperties();
     void generateSourceInclude();
     void generateSourceConstructor();
-    bool m_conversionSuccessful;
+    void generateSourceGetMethods();
+    void generateSourceSetMethods();
     QUrl m_qmlFileName;
     QString m_className;
     QString m_headerFileContents;

@@ -15,7 +15,6 @@ static QVector<QString> alreadySupportedTypes({"int",
                                              "long"});
 
 CppFromQMLGenerator::CppFromQMLGenerator(QString qmlFileName) :
-    m_conversionSuccessful(false),
     m_qmlFileName(qmlFileName)
 {
     m_appEngine.load(m_qmlFileName);
@@ -43,7 +42,6 @@ CppFromQMLGenerator::~CppFromQMLGenerator()
 QString CppFromQMLGenerator::generateHeader()
 {
     m_headerFileContents = "";
-    m_conversionSuccessful = true;
     generateMultipleInclusionProtectionBegin();
     generateHeaderIncludes();
     generateClassDeclaration();
@@ -54,10 +52,7 @@ QString CppFromQMLGenerator::generateHeader()
     generateHeaderPrivateProperties();
     generateClassClosing();
     generateMultipleInclusionProtectionEnd();
-    if (m_conversionSuccessful)
-        return m_headerFileContents;
-    else
-        return QString();
+    return m_headerFileContents;
 }
 
 void CppFromQMLGenerator::generateMultipleInclusionProtectionBegin()
@@ -175,13 +170,11 @@ void CppFromQMLGenerator::generateClassClosing()
 QString CppFromQMLGenerator::generateSource()
 {
     m_sourceFileContents = "";
-    m_conversionSuccessful = true;
     generateSourceInclude();
     generateSourceConstructor();
-    if (m_conversionSuccessful)
-        return m_sourceFileContents;
-    else
-        return QString();
+    generateSourceGetMethods();
+    generateSourceSetMethods();
+    return m_sourceFileContents;
 }
 
 void CppFromQMLGenerator::generateSourceInclude()
@@ -191,6 +184,58 @@ void CppFromQMLGenerator::generateSourceInclude()
 
 void CppFromQMLGenerator::generateSourceConstructor()
 {
-    m_sourceFileContents += m_className + "::" + m_className + "()\n";
+    m_sourceFileContents += m_className + "::" + m_className + "()";
+    if (m_rootObject->propertyCount() > QML_INHERITED_ITEM_COUNT)
+        m_sourceFileContents += " :";
+    m_sourceFileContents += "\n";
+    for (int i = QML_INHERITED_ITEM_COUNT ; i < m_rootObject->propertyCount() ; ++i) {
+        m_sourceFileContents += "    m_"
+                          + QString(m_rootObject->property(i).name())
+                          + "(";
+        if ((QVariant::String == m_rootObject->property(i).type()) ||
+            (QVariant::Color == m_rootObject->property(i).type()))
+            m_sourceFileContents += "\"" + m_rootObject->property(i).read(m_appEngine.rootObjects()[0]).toString() + "\")";
+        else
+            m_sourceFileContents += m_rootObject->property(i).read(m_appEngine.rootObjects()[0]).toString() + ")";
+        if (i < m_rootObject->propertyCount()-1)
+            m_sourceFileContents += ",";
+        m_sourceFileContents += "\n";
+    }
     m_sourceFileContents += "{\n}\n";
+}
+
+void CppFromQMLGenerator::generateSourceGetMethods()
+{
+    for (int i = QML_INHERITED_ITEM_COUNT ; i < m_rootObject->propertyCount() ; ++i) {
+        QString uppercaseStartingName = QString(m_rootObject->property(i).name());
+        uppercaseStartingName[0] = uppercaseStartingName[0].toUpper();
+        m_sourceFileContents += "\n"
+                          + QString(m_rootObject->property(i).typeName())
+                          + " "
+                          + m_className
+                          + "::get"
+                          + uppercaseStartingName
+                          + "() const\n";
+        m_sourceFileContents += "{\n    return m_"
+                          + QString(m_rootObject->property(i).name())
+                          + ";\n}\n";
+    }
+}
+
+void CppFromQMLGenerator::generateSourceSetMethods()
+{
+    for (int i = QML_INHERITED_ITEM_COUNT ; i < m_rootObject->propertyCount() ; ++i) {
+        QString uppercaseStartingName = QString(m_rootObject->property(i).name());
+        uppercaseStartingName[0] = uppercaseStartingName[0].toUpper();
+        m_sourceFileContents += "\nvoid "
+                          + m_className
+                          + "::set"
+                          + uppercaseStartingName
+                          + "(const "
+                          + QString(m_rootObject->property(i).typeName())
+                          + " input)\n";
+        m_sourceFileContents += "{\n    m_"
+                          + QString(m_rootObject->property(i).name())
+                          + " = input;\n}\n";
+    }
 }
