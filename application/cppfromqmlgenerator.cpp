@@ -179,7 +179,7 @@ QString CppFromQMLGenerator::generateSource()
 
 void CppFromQMLGenerator::generateSourceInclude()
 {
-    m_sourceFileContents += "#include \"" + m_className.toLower() + ".h\"\n";
+    m_sourceFileContents += "#include \"" + getHeaderFilename() + "\"\n";
 }
 
 void CppFromQMLGenerator::generateSourceConstructor()
@@ -236,6 +236,19 @@ void CppFromQMLGenerator::generateSourceSetMethods()
                           + " input)\n";
         m_sourceFileContents += "{\n    m_"
                           + QString(m_rootObject->property(i).name())
-                          + " = input;\n}\n";
+                          + " = input;\n";
+        m_sourceFileContents += "    emit "
+                          + QString(m_rootObject->property(i).name())
+                          + "Changed();\n}\n";
     }
+}
+
+QString CppFromQMLGenerator::getHeaderFilename()
+{
+    return m_className.toLower() + ".h";
+}
+
+QString CppFromQMLGenerator::getSourceFilename()
+{
+    return m_className.toLower() + ".cpp";
 }

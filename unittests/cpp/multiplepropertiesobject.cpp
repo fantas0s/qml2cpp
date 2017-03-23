@@ -78,59 +78,71 @@ bool MultiplePropertiesObject::getThisIsTrue() const
 void MultiplePropertiesObject::setMyText(const QString input)
 {
     m_myText = input;
+    emit myTextChanged();
 }
 
 void MultiplePropertiesObject::setANumber(const int input)
 {
     m_aNumber = input;
+    emit aNumberChanged();
 }
 
 void MultiplePropertiesObject::setDasColor(const QColor input)
 {
     m_dasColor = input;
+    emit dasColorChanged();
 }
 
 void MultiplePropertiesObject::setAnotherText(const QString input)
 {
     m_anotherText = input;
+    emit anotherTextChanged();
 }
 
 void MultiplePropertiesObject::setDoubleDareNumber(const double input)
 {
     m_doubleDareNumber = input;
+    emit doubleDareNumberChanged();
 }
 
 void MultiplePropertiesObject::setARealNumber(const double input)
 {
     m_aRealNumber = input;
+    emit aRealNumberChanged();
 }
 
 void MultiplePropertiesObject::setThisIsFalse(const bool input)
 {
     m_thisIsFalse = input;
+    emit thisIsFalseChanged();
 }
 
 void MultiplePropertiesObject::setBNumber(const int input)
 {
     m_bNumber = input;
+    emit bNumberChanged();
 }
 
 void MultiplePropertiesObject::setBackgroundColor(const QColor input)
 {
     m_backgroundColor = input;
+    emit backgroundColorChanged();
 }
 
 void MultiplePropertiesObject::setDoubleAgain(const double input)
 {
     m_doubleAgain = input;
+    emit doubleAgainChanged();
 }
 
 void MultiplePropertiesObject::setNotSoRealNumber(const double input)
 {
     m_notSoRealNumber = input;
+    emit notSoRealNumberChanged();
 }
 
 void MultiplePropertiesObject::setThisIsTrue(const bool input)
 {
     m_thisIsTrue = input;
+    emit thisIsTrueChanged();
 }

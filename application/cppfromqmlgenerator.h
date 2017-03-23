@@ -12,6 +12,8 @@ public:
     ~CppFromQMLGenerator();
     QString generateHeader();
     QString generateSource();
+    QString getHeaderFilename();
+    QString getSourceFilename();
 private:
     CppFromQMLGenerator();
     void generateMultipleInclusionProtectionBegin();

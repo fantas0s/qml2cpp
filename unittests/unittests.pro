@@ -26,10 +26,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += tst_emptyobjecttest.cpp \
     ../application/cppfromqmlgenerator.cpp \
     main.cpp \
-    tst_objectswithpropertiestest.cpp
+    tst_objectswithpropertiestest.cpp \
+    tst_filenamestest.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 HEADERS += \
     ../application/cppfromqmlgenerator.h \
     tst_emptyobjecttest.h \
-    tst_objectswithpropertiestest.h
+    tst_objectswithpropertiestest.h \
+    tst_filenamestest.h

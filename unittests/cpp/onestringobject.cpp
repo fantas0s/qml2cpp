@@ -12,4 +12,5 @@ QString OneStringObject::getMyString() const
 void OneStringObject::setMyString(const QString input)
 {
     m_myString = input;
+    emit myStringChanged();
 }
